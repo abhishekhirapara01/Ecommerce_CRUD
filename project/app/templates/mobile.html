@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <style>
+    .navbar {
+      margin-bottom: 0px;
+      border-radius: 0;
+    }
+    body    
+      {
+          font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+      }
+  </style>
+</head>
+<body>
+
+<!-- Header section -->
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="/">ABHI</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="/">Home</a></li>
+        <li><a href="{% url 'show' %}">All Products</a></li>
+        {% if user.is_authenticated %}
+          <li><a href="{% url 'logoutaccount' %}">Logout</a></li>
+          {% else %}
+          <li><a href="{% url 'register' %}">Register</a></li>
+          <li><a href="{% url 'loginaccount' %}">Login</a></li>
+        {% endif %}
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="{% url 'logoutaccount' %}"><span class="glyphicon glyphicon-user"></span> {{ user.username }}</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<!-- Header section end -->
+
+<!-- Single Product Section -->
+<div class="container">
+  {% for i in mobile %}
+    <div class="card" style="width: 60%;">
+      <img src="{{i.img.url}}" class="card-img-left" alt="..." width="74%">
+      <div class="card-body">
+        <h5 class="card-title">NAME: {{i.Name}}</h5>
+        <h5 class="card-title">PRICE: ₹{{i.Price}}</h5>
+        <p class="card-text">DESCRIPTION: {{i.Description}}</p>
+        <h5 class="card-title">RAM: {{i.RAM}}</h5>
+        <h5 class="card-title">CAMERA: {{i.Camera}}</h5>
+        <h5 class="card-title">DISPLAY: {{i.Display}}</h5>
+        <h5 class="card-title">OS: {{i.OS}}</h5>
+        <h5 class="card-title">COMPANY: {{i.company_id}}</h5>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+<!-- End Single Product Section -->
+
+</body>
+</html>

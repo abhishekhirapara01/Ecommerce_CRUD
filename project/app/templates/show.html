@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Show All</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <style>
+    /* Remove the navbar's default rounded borders and increase the bottom margin */ 
+    .navbar {
+      margin-bottom: 50px;
+      border-radius: 0;
+    }
+   
+  </style>
+</head>
+<body>
+
+<!-- Header section -->
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="/">ABHI</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="/">Home</a></li>
+        <li><a href="{% url 'show' %}">All Products</a></li>
+        {% if user.is_authenticated %}
+          <li><a href="{% url 'logoutaccount' %}">Logout</a></li>
+          {% else %}
+          <li><a href="{% url 'register' %}">Register</a></li>
+          <li><a href="{% url 'loginaccount' %}">Login</a></li>
+        {% endif %}
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="{% url 'logoutaccount' %}"><span class="glyphicon glyphicon-user"></span> {{ user.username }}</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<!-- Header section end -->
+
+<!-- show all the products -->
+<div class="container">    
+  <div class="row">
+    {% for i in mobiles %}
+    <div class="col-sm-4">
+        <div class="panel panel-primary">
+          <div class="panel-body">
+            <img src="{{i.img.url}}" class="img-responsive" style="width:100%" alt="Image">
+          </div>
+            <center> <a href="{% url 'mobile' i.id %}" target="_blank"><h3>{{i.Name}}</h3></a></center>
+          <div class="panel-footer">{{i.Description}}
+            <br>
+            <center>
+            <a href="/update/{{i.id}}" class="btn btn-dark">
+              <span class="btn glyphicon glyphicon-pencil">Edit</span></a>
+            <a href="/delete/{{i.id}}" class="btn btn-danger">Delete</a>
+            </center>
+          </div> 
+        </div>     
+    </div>
+    {% endfor %}  
+  </div>
+  <center>
+    <a href="/add/" class="btn btn-dark">Add A New Mobile Here</a>
+  </center>
+</div><br><br>
+<!-- End of product section -->
+
+</body>
+</html>

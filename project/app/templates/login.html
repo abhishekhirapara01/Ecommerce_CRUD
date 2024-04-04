@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <title>Login</title>
+  <style>
+    .navbar {
+      margin-bottom: 50px;
+      border-radius: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header section -->
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="/">ABHI</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="/">Home</a></li>
+        <li><a href="{% url 'show' %}">All Products</a></li>
+        {% if user.is_authenticated %}
+          <li><a href="{% url 'logoutaccount' %}">Logout</a></li>
+          {% else %}
+          <li><a href="{% url 'register' %}">Register</a></li>
+          <li><a href="{% url 'loginaccount' %}">Login</a></li>
+        {% endif %}
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="{% url 'logoutaccount' %}"><span class="glyphicon glyphicon-user"></span> {{ user.username }}</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<!-- Header section end -->
+
+<!-- Login section -->
+<div class="container">
+  <div class="card mb-3">
+    <div class="row g-0">
+      <div>
+        <div class="card-body">
+          <h5 class="card-title">Login</h5>
+          {% if error %}
+          <div class="alert alert-danger mt-3" role="alert">
+            {{ error }}
+          </div>
+          {% endif %}
+          <p class="card-text">
+            <form method="POST">
+              {% csrf_token %}
+              {{ form.as_p }}
+              <button type="submit" class="btn btn-success">
+                  Login
+              </button>
+            </form>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Login section end -->
+
+</body>
+</html>
