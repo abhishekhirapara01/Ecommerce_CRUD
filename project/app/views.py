@@ -1,11 +1,14 @@
 from django.shortcuts import render,redirect
-from .models import Mobile,Company
+from .models import Mobile,Company,Order,Cart
 from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import UserCreateForm,MobileForm
 from django.contrib.auth.models import User
+from django.shortcuts import redirect, get_object_or_404
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.core.mail import send_mail
 # Create your views here.
 
 def index(request): 
@@ -59,8 +62,13 @@ def register(request):
   else:
     if request.POST['password1'] == request.POST['password2']:
       try:
-        user=User.objects.create_user(request.POST['username'],password=request.POST['password1'])
+        user=User.objects.create_user(request.POST['username'],password=request.POST['password1'],email=request.POST['email'])
         user.save()
+        subject = 'Welcome to Our Electronic Store!!'
+        message = f'Hi {user.username}, Thank you for Registration'
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [user.email]
+        send_mail(subject,message,email_from,recipient_list)
         login(request,user)
         return redirect('index')
       except IntegrityError:
@@ -96,3 +104,40 @@ def loginaccount(request):
 def logoutaccount(request):
   logout(request)
   return render(request,'index.html')
+
+@login_required
+def add_to_cart(request, id):
+    if request.user.is_authenticated:
+        mobile = get_object_or_404(Mobile, id=id)
+        cart_item, created = Cart.objects.get_or_create(user=request.user, mobile=mobile)
+        if not created:
+            cart_item.quantity += 1
+            cart_item.save()
+        return redirect('checkout')
+    else:
+        return redirect('loginaccount')
+    
+@login_required
+def remove_from_cart(request, mobile_id):
+    cart_item = get_object_or_404(Cart, user=request.user, mobile_id=mobile_id)
+    cart_item.delete()
+    return redirect('checkout') 
+
+# Modify the checkout function
+@login_required
+def checkout(request):
+    cart_items = Cart.objects.filter(user=request.user)
+    total_price = sum(item.mobile.Price * item.quantity for item in cart_items)
+    return render(request, 'checkout.html', {'cart_items': cart_items, 'total_price': total_price})
+
+# Modify the index function to display add to cart buttons
+def order_confirmation(request):
+    orders = Order.objects.all()
+    return render(request, 'order_confirmation.html',{'orders':orders})
+
+# Modify the confirm_checkout function
+def confirm_checkout(request):
+    if request.method == 'POST':
+        return redirect('order_confirmation')
+    else:
+        return redirect('checkout')

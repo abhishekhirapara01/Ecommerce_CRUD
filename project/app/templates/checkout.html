@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Checkout</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <style>
+        /* Custom styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa; /* Light gray background */
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #343a40; /* Dark background */
+            border-color: #343a40;
+            border-radius: 0;
+            margin-bottom: 0;
+        }
+        .navbar-brand {
+            color: #fff; /* White text */
+        }
+        .navbar-brand:hover {
+            color: #ccc; /* Light gray text on hover */
+        }
+        button {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body> 
+   <!-- Header section -->
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>                        
+        </button>
+        <a class="navbar-brand" href="/">ABHI</a>
+      </div>
+      <div class="collapse navbar-collapse" id="myNavbar">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="/">Home</a></li>
+          <li><a href="{% url 'show' %}">All Products</a></li>
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'logoutaccount' %}">Logout</a></li>
+            {% else %}
+            <li><a href="{% url 'register' %}">Register</a></li>
+            <li><a href="{% url 'loginaccount' %}">Login</a></li>
+          {% endif %}
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="{% url 'logoutaccount' %}"><span class="glyphicon glyphicon-user"></span> {{ user.username }}</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- Header section end -->
+    <div class="container">
+        <div class="row">
+            <!-- Checkout Section -->
+            <div class="col-md-6">
+                <h1 class="mt-4">Checkout</h1>
+                <!-- Order Summary -->
+                <div class="mt-4">
+                    <h2>Order Summary</h2>
+                    <!-- Table for Order Summary -->
+                    <table class="table">
+                        <!-- Table Headers -->
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <!-- Table Body -->
+                        <tbody>
+                            {% load mathfilters %}
+                            {% if cart_items %}
+                                {% for cart_item in cart_items %}
+                                    <tr>
+                                        <td>{{ cart_item.mobile.Name }}</td>
+                                        <td>{{ cart_item.quantity }}</td>
+                                        <td>{{ cart_item.mobile.Price }}</td> <!-- Access Price attribute through associated Mobile object -->
+                                        <td>{{ cart_item.quantity|mul:cart_item.mobile.Price }}</td> <!-- Calculate total price using math_filters -->
+                                        <td> 
+                                            <form method="post" action="{% url 'remove_from_cart' cart_item.mobile.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr align="center">
+                                    <td colspan="5">No Items Added Please Add Items to Checkout</td>
+                                </tr>
+                                <tr align="center">
+                                    <td colspan="5">
+                                        <a href="/show/" class="btn btn-warning">Add To Cart</a>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    <!-- Total Price -->
+                    <center><strong><p>Total Price: ₹ {{ total_price }}</p></strong></center>
+                </div>
+            </div>
+    
+            <!-- Shipping Information Section -->
+            <div class="col-md-6">
+                <h2>Shipping Information</h2>
+                <!-- Shipping Information Form -->
+                <form method="post" action="{% url 'confirm_checkout' %}">
+                    {% csrf_token %}
+                    <!-- Full Name Input -->
+                    <div class="form-group">
+                        <label for="full_name">Full Name:</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" required>
+                    </div>
+                    <!-- Address Textarea -->
+                    <div class="form-group">
+                        <label for="address">Address:</label>
+                        <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                    </div>
+                    <!-- City and ZIP Code Inputs (Grouped in a Row) -->
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="city">City:</label>
+                            <input type="text" class="form-control" id="city" name="city" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="zip_code">ZIP Code:</label>
+                            <input type="text" class="form-control" id="zip_code" name="zip_code" required>
+                        </div>
+                    </div>
+                    <!-- Country Input -->
+                    <div class="form-group">
+                        <label for="country">Country:</label>
+                        <input type="text" class="form-control" id="country" name="country" required>
+                    </div>
+                    <!-- Confirm Order Button -->
+                    <button type="submit" class="btn btn-primary">Confirm Order</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS (Optional, if needed) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
